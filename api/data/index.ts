@@ -30,6 +30,16 @@ type CreateShopType = {
     type: string;
 };
 
+type CreateRoomType = {
+    idHost: mongoose.Types.ObjectId;
+    idGuest: mongoose.Types.ObjectId;
+    startedAt: Date;
+    endedAt: Date;
+    winner: mongoose.Types.ObjectId;
+    division: string;
+    finished: boolean;
+};
+
 interface Character extends Document {
     name: string;
     clase: string;
@@ -44,6 +54,16 @@ interface Shop extends Document {
     name: string;
     price: number;
     type: string;
+}
+
+interface RoomDocument extends Document {
+    idHost: mongoose.Types.ObjectId;
+    idGuest: mongoose.Types.ObjectId;
+    startedAt: Date;
+    endedAt: Date;
+    winner: mongoose.Types.ObjectId;
+    division: string;
+    finished: boolean;
 }
 
 interface InventoryItem extends Document {
@@ -140,9 +160,47 @@ const shopSchema = new Schema<Shop>({
     }
 });
 
+const roomSchema = new Schema<RoomDocument>({
+    idHost: {
+        type: Schema.Types.ObjectId,
+        ref: 'Character',
+        required: true
+    },
+    idGuest: {
+        type: Schema.Types.ObjectId,
+        ref: 'Character',
+        required: false
+    },
+    startedAt: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    endedAt: {
+        type: Date,
+        required: false
+    },
+    winner: {
+        type: Schema.Types.ObjectId,
+        required: false
+    },
+    division: {
+        type: String,
+        required: true,
+        enum: ['bronze', 'silver', 'gold', 'platinum', 'emerald', 'diamond', 'master', 'grandmaster', 'challenger']
+    },
+    finished: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
+});
+
+
 const User = model<UserType & Document>('User', userSchema);
 const Character = model<Character & Document>('Character', createCharacterSchema);
 const Shop = model<Shop & Document>('Shop', shopSchema);
+const RoomModel = model<RoomDocument & Document>('Room', roomSchema);
 
 export {
     UserType,
@@ -152,5 +210,7 @@ export {
     CreateCharacterType,
     Character,
     CreateShopType,
-    Shop
+    Shop,
+    CreateRoomType,
+    RoomModel
 };

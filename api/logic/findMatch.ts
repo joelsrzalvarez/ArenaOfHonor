@@ -1,4 +1,6 @@
-import { Server, Socket } from "socket.io";
+import mongoose from 'mongoose';
+import { Server, Socket } from 'socket.io';
+import { RoomModel } from '../data/index'; 
 
 interface Player {
   id: string;
@@ -8,49 +10,103 @@ interface Player {
   skin: string;
 }
 
-interface Room {
+interface GameRoom {
   id: string;
   players: Player[];
   timerId?: NodeJS.Timeout;
   gameEnded: boolean;
+  winner?: string;
 }
 
-const rooms: Room[] = [];
+const rooms: GameRoom[] = [];
 const MAX_PLAYERS_PER_ROOM = 2;
 
-export const handleMatchMaking = (io: Server, socket: Socket, { idPlayer, skin, name }): void => {
+export const handleMatchMaking = async (io: Server, socket: Socket, { idPlayer, skin, name }): Promise<void> => {
+    console.log(`Player ${idPlayer} is looking for a match`);
+    const roomWithPlayers = rooms.find(room => room.players.length > 0);
+    if (roomWithPlayers) {
+        console.log('Jugadores en la room:', JSON.stringify(roomWithPlayers.players.map(({ id, name, health, skin }) => ({
+            id, name, health, skin
+        })), null, 2));
+    } else {
+        console.log('No se encontraron rooms con jugadores.');
+    }
+
     let availableRoom = rooms.find(room => room.players.length < MAX_PLAYERS_PER_ROOM && !room.gameEnded);
+    console.log('AVAILABLE ROOM IS:', availableRoom ? JSON.stringify({
+        id: availableRoom.id,
+        players: availableRoom.players.map(({ id, name, health, skin }) => ({
+            id, name, health, skin
+        })),
+        gameEnded: availableRoom.gameEnded,
+        winner: availableRoom.winner
+    }, null, 2) : 'None');
 
     if (availableRoom) {
-        addPlayerToRoom(availableRoom, { id: idPlayer, socket, name, health: 100, skin });
-        if (availableRoom.players.length === MAX_PLAYERS_PER_ROOM) {
-            startMatch(io, availableRoom);
+        // ensure player is not already in the room
+        const isPlayerAlreadyInRoom = availableRoom.players.some(player => player.id === idPlayer);
+        console.log(`Is player already in room: ${isPlayerAlreadyInRoom}`);
+        if (!isPlayerAlreadyInRoom) {
+            addPlayerToRoom(availableRoom, { id: idPlayer, socket, name, health: 100, skin });
+            console.log(`Player ${idPlayer} added to room ${availableRoom.id}`);
+            console.log('Jugadores en la room:', JSON.stringify(availableRoom.players.map(({ id, name, health, skin }) => ({
+                id, name, health, skin
+            })), null, 2));
+
+            if (availableRoom.players.length === MAX_PLAYERS_PER_ROOM) {
+                const guest = availableRoom.players[1];
+                const roomDocument = await RoomModel.findById(availableRoom.id);
+                if (roomDocument) {
+                    roomDocument.idGuest = new mongoose.Types.ObjectId(guest.id);
+                    await roomDocument.save();
+                    console.log(`Room ${availableRoom.id} updated with guest ${guest.id}`);
+                }
+                startMatch(io, availableRoom);
+            }
+        } else {
+            console.log(`Player ${idPlayer} is already in room ${availableRoom.id}`);
         }
     } else {
-        createNewRoom({ id: idPlayer, socket, name, health: 100, skin });
+        console.log(`No available room found, creating a new room for player ${idPlayer}`);
+        const division = 'bronze';  // TODO Get division from ELO emit
+        const newRoom = await createNewRoom({ id: idPlayer, socket, name, health: 100, skin }, division);
+        rooms.push(newRoom);
+        console.log(`New room ${newRoom.id} created for player ${idPlayer}`);
+        console.log('Jugadores en la nueva room:', JSON.stringify(newRoom.players.map(({ id, name, health, skin }) => ({
+            id, name, health, skin
+        })), null, 2));
     }
 };
 
-export const handleCancelMatchMaking = (socket: Socket, { id }: { id: string }): void => {
+export const handleCancelMatchMaking = async (socket: Socket, { id }: { id: string }): Promise<void> => {
     const room = rooms.find(room => room.players.some(player => player.id === id && room.players.length < MAX_PLAYERS_PER_ROOM && !room.gameEnded));
-    
+
     if (room) {
-        removePlayerFromRoom(room, id);
+        await removePlayerFromRoom(room, id);
     }
 };
 
-const addPlayerToRoom = (room: Room, player: Player): void => {
+const addPlayerToRoom = (room: GameRoom, player: Player): void => {
     room.players.push(player);
+    console.log(`Player ${player.id} added to room ${room.id}`);
 };
 
-const createNewRoom = (player: Player): void => {
-    const newRoomId = `room_${Math.floor(Math.random() * 100000) + 1}`;
-    const newRoom: Room = { id: newRoomId, players: [player], gameEnded: false };
-    rooms.push(newRoom);
-    console.log(`New room created with ID ${newRoomId}`);
+const createNewRoom = async (player: Player, division: string): Promise<GameRoom> => {
+    const newRoom = new RoomModel({
+        idHost: new mongoose.Types.ObjectId(player.id),
+        division,
+        finished: false
+    });
+    await newRoom.save();
+    console.log(`New room created with ID ${newRoom._id}`);
+    return {
+        id: newRoom._id.toString(),
+        players: [player],  // add the player here avoids adding twice
+        gameEnded: false
+    };
 };
 
-const startMatch = (io: Server, room: Room): void => {
+const startMatch = (io: Server, room: GameRoom): void => {
     io.emit('start', {
         roomId: room.id,
         players: room.players.map(player => player.id),
@@ -66,7 +122,7 @@ const startMatch = (io: Server, room: Room): void => {
     });
 };
 
-const setupPlayerEventHandlers = (player: Player, room: Room): void => {
+const setupPlayerEventHandlers = (player: Player, room: GameRoom): void => {
     player.socket.on('moveBox', (data) => {
         const { playerId, direction, positionX } = data;
         player.socket.broadcast.emit('boxMoved', { playerId, direction, positionX });
@@ -90,10 +146,12 @@ const setupPlayerEventHandlers = (player: Player, room: Room): void => {
         player.socket.broadcast.emit('playerHit', { playerId });
     });
 
-    player.socket.on('winner', ({ playerId, targetId }) => {
-        player.socket.broadcast.emit('congratsWinner', { targetId });
+    player.socket.on('winner', async ({ playerId }) => {
+        room.winner = playerId;
+        console.log(room.winner)
+        player.socket.broadcast.emit('congratsWinner', { playerId });
         clearInterval(room.timerId);
-        endGame(room);
+        await endGame(room);
     });
 
     player.socket.on('sendJump', ({ targetId }) => {
@@ -105,7 +163,7 @@ const setupPlayerEventHandlers = (player: Player, room: Room): void => {
     });
 };
 
-const handleAttack = (room: Room, playerId: string, roomId: string, targetId: string): void => {
+const handleAttack = (room: GameRoom, playerId: string, roomId: string, targetId: string): void => {
     if (room.id === roomId && !room.gameEnded) {
         const target = room.players.find(player => player.id === targetId);
         if (target) {
@@ -124,6 +182,7 @@ const handleAttack = (room: Room, playerId: string, roomId: string, targetId: st
                 room.players.forEach(player => {
                     player.socket.broadcast.emit('playerDied', { playerId, targetId: target.id });
                 });
+                room.winner = playerId;
                 room.gameEnded = true;
                 clearInterval(room.timerId);
                 endGame(room);
@@ -136,31 +195,33 @@ const handleAttack = (room: Room, playerId: string, roomId: string, targetId: st
     }
 };
 
-
-const removePlayerFromRoom = (room: Room, playerId: string): void => {
+const removePlayerFromRoom = async (room: GameRoom, playerId: string): Promise<void> => {
     room.players = room.players.filter(player => player.id !== playerId);
     if (room.players.length === 0) {
         rooms.splice(rooms.indexOf(room), 1);
         console.log(`Room ${room.id} deleted because player ${playerId} canceled the match.`);
+        await RoomModel.findByIdAndDelete(room.id);
     }
 };
 
-const handlePlayerDisconnect = (room: Room, player: Player): void => {
-    if (!room.gameEnded) {
-        removePlayerFromRoom(room, player.id);
-        if (room.players.length === 0) {
-            clearInterval(room.timerId);
-            rooms.splice(rooms.indexOf(room), 1);
-            console.log(`Room ${room.id} deleted because all players disconnected.`);
-        } else {
-            room.players.forEach(p => {
-                p.socket.emit('opponentDisconnected', { playerId: player.id });
-            });
+const handlePlayerDisconnect = async (room: GameRoom, player: Player): Promise<void> => {
+    if (room.players.length === 0) {
+        clearInterval(room.timerId);
+    } else {
+        const roomDocument = await RoomModel.findById(room.id);
+        if (roomDocument) {
+            roomDocument.finished = true;
+            roomDocument.endedAt = new Date();
+            roomDocument.winner = new mongoose.Types.ObjectId(room.winner);
+            await roomDocument.save();
         }
+        room.players.forEach(p => {
+            p.socket.emit('opponentDisconnected', { playerId: player.id });
+        });
     }
 };
 
-const startGame = (room: Room): void => {
+const startGame = (room: GameRoom): void => {
     let timeLeft = 60;
     room.timerId = setInterval(() => {
         timeLeft--;
@@ -178,10 +239,15 @@ const startGame = (room: Room): void => {
     }, 1000);
 };
 
-const endGame = (room: Room): void => {
+const endGame = async (room: GameRoom): Promise<void> => {
     room.players.forEach(player => {
-        player.socket.emit('gameEnded', { roomId: room.id });
+        player.socket.emit('gameEnded', { roomId: room.id, winner: room.winner });
     });
-    rooms.splice(rooms.indexOf(room), 1);
-    console.log(`Room ${room.id} ended and deleted.`);
+    const roomDocument = await RoomModel.findById(room.id);
+    if (roomDocument) {
+        roomDocument.finished = true;
+        roomDocument.endedAt = new Date();
+        roomDocument.winner = new mongoose.Types.ObjectId(room.winner);
+        await roomDocument.save();
+    }
 };
