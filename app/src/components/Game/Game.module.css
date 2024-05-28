@@ -1,0 +1,116 @@
+html, body {
+    height: 100%; 
+    margin: 0; 
+    padding: 0; 
+}
+
+.container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.hud {
+    position: absolute;
+    color: white;
+    width: 100%;
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.healthSection {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.playerInfo {
+    margin-top: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.healthLayout {
+    position: relative;
+    height: 30px;
+    width: 100%;
+}
+
+.remainingHealthbar {
+    background-color: #EF4444;
+    height: 30px;
+    width: 100%;
+}
+
+.totalHealthBar {
+    position: absolute;
+    background-color: #009e00;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.timer {
+    background-color: wheat;
+    font-family: 'silver';
+    font-size: 2vw; /* Cambiado a unidades relativas */
+    height: 50px;
+    width: 75px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center; 
+}
+
+.result {
+    position: absolute;
+    font-family: 'silver';
+    font-size: 100px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: wheat;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-shadow: 1px 0 0 black, -1px 0 0 black, 0 1px 0 black, 0 -1px 0 black, 1px 1px black, -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black;
+}
+
+.game {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+#gameWindow {
+    border: 2px solid black;
+}
+
+.animate-charcter {
+    text-transform: uppercase;
+    background-image: linear-gradient(-225deg,
+            #231557 0%,
+            #44107a 29%,
+            #A8EEE3 67%,
+            #9eade9 100%);
+    background-size: auto auto;
+    background-clip: border-box;
+    background-size: 200% auto;
+    color: #fff;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textclip 2s linear infinite;
+    display: inline-block;
+    font-size: 190px;
+}

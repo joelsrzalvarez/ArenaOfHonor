@@ -1,0 +1,40 @@
+{
+  "dependencies": {
+    "@types/chai-as-promised": "^7.1.8",
+    "@types/jsonwebtoken": "^9.0.6",
+    "colors": "^1.4.0",
+    "com": "file:../com",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.7.5",
+    "tracer": "^1.3.0"
+  },
+  "name": "api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tsx index.ts",
+    "inspect": "npx tsx --inspect-brk index.ts",
+    "test": "npx mocha --timeout 10000",
+    "test-inspect": "npx mocha --inspect-brk",
+    "populate": "ts-node populate.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/chai": "^4.3.14",
+    "@types/jest": "^29.5.12",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.12",
+    "chai": "^4.4.1",
+    "chai-as-promised": "^7.1.1",
+    "dotenv": "^16.4.5",
+    "mocha": "^10.4.0",
+    "mongoose": "^8.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

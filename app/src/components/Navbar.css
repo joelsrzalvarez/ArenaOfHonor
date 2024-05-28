@@ -1,0 +1,18 @@
+.navbar-nav.ms-auto.user-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-nav .btn {
+    margin-left: 10px;
+}
+
+.user-points .btn {
+    margin-right: 10px; /* Añadir margen a la derecha */
+}
+
+.navbar-nav .title-aoh {
+    margin-right: auto;
+    margin-left: auto;
+}

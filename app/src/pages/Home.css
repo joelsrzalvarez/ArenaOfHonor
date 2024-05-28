@@ -1,0 +1,215 @@
+.character-gif {
+    margin: 0;
+    padding: 0;
+}
+
+.character-card {
+    color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    margin-left: 15px;
+    border-radius: 8px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer; 
+}
+
+.character-card.selected {
+    background: linear-gradient(135deg, green 100%, green 100%);
+}
+
+.character-card h3 {
+    margin: 10px 0;
+}
+
+.character-card .character-icon {
+    width: 80px;
+    height: 80px;
+    position: absolute; 
+    top: 10px;  
+    left: 10px;  
+    margin-bottom: 10px;
+}
+
+.character-card .character-elo {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 10px;
+    left: 80%;
+    margin-bottom: 10px;
+}
+
+.character-card .character-name {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.character-card .character-class {
+    font-size: 1.2em;
+    color: #e0e0e0;
+}
+
+.character-card .character-wins {
+    font-size: 1.2em;
+    color: #76ff03;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.btn-primary, .btn-success, .btn-danger {
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+.btn-primary {
+    background-color: #4b8496;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.centrator {
+    margin-top: -25%;
+}
+
+.image-gif{
+    width: 500px;
+}
+
+.image-elo{
+    width: 72px;
+    height: 72px;
+}
+
+
+.character-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; 
+    margin-top: 0px;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-container .col-md-5 {
+    display: flex;
+    justify-content: center;
+}
+
+.character-name select {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.form-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .character-card {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .character-card .character-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .character-card .character-elo {
+        width: 60px;
+        height: 60px;
+        top: -5px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .image-gif {
+        margin-left: -110px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .character-elo {
+        margin-left: -15px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .form-home {
+        margin-top: 45%;
+    }
+}
+
+.elo-iron {
+    background: linear-gradient(135deg, #6a6a6a 0%, #6a6a6a 100%);
+    border: 2px solid #6a6a6a; 
+}
+
+.elo-bronze {
+    background: linear-gradient(135deg, #cd7f32 0%, #cd7f32 100%);
+    border: 2px solid #cd7f32;
+}
+
+.elo-silver {
+    background: linear-gradient(135deg, #cd7f32 0%, #cd7f32 100%);
+    border: 2px solid #c0c0c0; 
+}
+
+.elo-gold {
+    background: linear-gradient(135deg, #ffd700 0%, #ffd700 100%);
+    border: 2px solid #ffd700; 
+}
+
+.elo-platinum {
+    background: linear-gradient(135deg, #ffd700 0%, #ffd700 100%);
+    border: 2px solid #e5e4e2; 
+}
+
+.elo-emerald {
+    background: linear-gradient(135deg, #50c878 0%, #50c878 100%);
+    border: 2px solid #50c878; 
+}
+
+.elo-diamond {
+    background: linear-gradient(135deg, #b9f2ff 0%, #b9f2ff 100%);
+    border: 2px solid #b9f2ff;
+}
+
+.elo-master {
+    background: linear-gradient(135deg, #ff00ff 0%, #ff00ff 100%);
+    border: 2px solid #ff00ff; 
+}
+
+.elo-grandmaster {
+    background: linear-gradient(135deg, #ff4500 0%, #ff4500 100%);
+    border: 2px solid #ff4500; 
+}
+
+.elo-challenger {
+    border: 2px solid gold;
+    background: linear-gradient(135deg, #3084dc 0%, #f2c119 100%);
+}
+
+.elo-default {
+    border: 2px solid #000; 
+}
