@@ -221,12 +221,12 @@ function Game({ socket, roomId, characterIds, characters, players, playerNames, 
         });
 
         socket.on('congratsWinner', async data => {
-            const { targetId } = data;
+            const { playerId } = data;
             try {
-                if (currentPlayerId === idHost && targetId === idGuest) {
+                if (currentPlayerId === idHost && playerId === idHost) {
                     alert('Enhorabuena has ganado, sumas 1 victoria y 10 puntos de honor');
                     await logic.updateWins(idHost, idGuest);
-                } else if (currentPlayerId === idGuest && targetId === idHost) {
+                } else if (currentPlayerId === idGuest && playerId === idGuest) {
                     alert('Enhorabuena has ganado, sumas 1 victoria y 10 puntos de honor');
                     await logic.updateWins(idGuest, idHost);
                 }
