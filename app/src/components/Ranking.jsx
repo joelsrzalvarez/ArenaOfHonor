@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import retrieveRanking from '../logic/retrieveRanking';
 import './Ranking.css';
- //TODO Retrieve elo logo instead ELO points
+
 function Ranking({ show, onClose }) {
   const [characters, setCharacters] = useState([]);
   const [error, setError] = useState(null);
@@ -56,32 +56,25 @@ function Ranking({ show, onClose }) {
     }
   };
 
-  const getEloImageAndClass = (elo) => {
-    switch(elo) {
-        case 'iron':
-            return '/assets/img/elo/iron.png';
-        case 'bronze':
-            return '/assets/img/elo/bronze.png'; 
-        case 'silver':
-            return '/assets/img/elo/silver.png'; 
-        case 'gold':
-            return '/assets/img/elo/gold.png'; 
-        case 'platinum':
-            return '/assets/img/elo/platinum.png'; 
-        case 'emerald':
-            return '/assets/img/elo/emerald.png'; 
-        case 'diamond':
-            return '/assets/img/elo/diamond.png'; 
-        case 'master':
-            return '/assets/img/elo/master.png'; 
-        case 'grandmaster':
-            return '/assets/img/elo/grandmaster.png';
-        case 'challenger':
-            return '/assets/img/elo/challenger.png'; 
-        default:
-            return '/assets/img/elo/default.png'; 
-    }
-}
+  const getEloImage = (winStreak) => {
+    const divisions = {
+      bronze: { min: 1, max: 500 },
+      silver: { min: 501, max: 799 },
+      gold: { min: 800, max: 999 },
+      platinum: { min: 1000, max: 1499 },
+      emerald: { min: 1500, max: 1999 },
+      diamond: { min: 2000, max: 2499 },
+      master: { min: 2500, max: 2999 },
+      grandmaster: { min: 3000, max: 3499 },
+      challenger: { min: 3500, max: Infinity },
+    };
+
+    const division = Object.entries(divisions).find(([name, range]) =>
+      winStreak >= range.min && winStreak <= range.max
+    )?.[0] || 'iron';
+
+    return `/assets/img/elo/${division}.png`;
+  };
 
   return (
     <div className="modal-overlay">
@@ -98,7 +91,7 @@ function Ranking({ show, onClose }) {
                 <th>Position</th>
                 <th>Name</th>
                 <th>Class</th>
-                <th>Wins</th>
+                <th>Division</th>
               </tr>
             </thead>
             <tbody>
@@ -107,7 +100,9 @@ function Ranking({ show, onClose }) {
                   <td>{getPosition(startIndex + index)}</td>
                   <td>{char.name}</td>
                   <td>{char.clase}</td>
-                  <td>{char.win_streak}</td>
+                  <td>
+                    <img src={getEloImage(char.win_streak)} width='60px' height='60px' alt={char.win_streak} className="elo-image" />
+                  </td>
                 </tr>
               ))}
             </tbody>
