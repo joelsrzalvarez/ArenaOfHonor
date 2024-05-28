@@ -4,7 +4,7 @@ import authenticateUser from './authenticateUser.ts'
 import retrieveUser from './retrieveUser.ts'
 import retrieveCharacter from './retrieveCharacter.ts'
 import deleteCharacter from './deleteCharacter.ts'
-import { handleMatchMaking } from './findMatch.ts'
+import { handleMatchMaking, handleCancelMatchMaking } from './findMatch.ts'
 import retrieveRanking from './retrieveRanking.ts'
 import retrieveShop from './retrieveShop.ts'
 import buyItem from './buyItem.ts'
@@ -20,6 +20,7 @@ const logic = {
     retrieveCharacter,
     deleteCharacter,
     handleMatchMaking,
+    handleCancelMatchMaking,
     retrieveRanking,
     retrieveShop,
     buyItem,

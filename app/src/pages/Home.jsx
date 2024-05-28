@@ -121,15 +121,16 @@ function Home() {
             const selectedCharacter = characters.find(char => char._id === id);
             const selectedSkin = skins[id] || selectedCharacter.clase.toLowerCase();
             const characterName = selectedCharacter ? selectedCharacter.name : 'Unknown';
-            
+    
             if (!searching) {
                 socket.emit('findMatch', { id: id, skin: selectedSkin, name: characterName });
                 setSearching(true);
             } else {
+                socket.emit('cancelMatch', { id: id });
                 setSearching(false);
             }
         }
-    };
+    };    
     
     const handleDeleteCharacterClick = () => {
         if (selectedCharacterId) {

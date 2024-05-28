@@ -291,6 +291,11 @@ mongoose.connect(MONGODB_URL)
             logic.handleMatchMaking(io, socket, { idPlayer: id, skin: skin, name: name });
         });
     
+        socket.on('cancelMatch', (data) => {
+            console.log(`${data.id} quiere cancelar la partida`)
+            logic.handleCancelMatchMaking(socket, data);
+        });
+    
         socket.on('disconnect', () => {
             logger.info(`User ${socket.id} has disconnected`);
         });

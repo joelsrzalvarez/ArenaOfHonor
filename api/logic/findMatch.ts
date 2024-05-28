@@ -99,6 +99,20 @@ export const handleMatchMaking = (io: Server, socket: Socket, { idPlayer, skin, 
     }
 };
 
+export const handleCancelMatchMaking = (socket: Socket, { id }: { id: string }): void => {
+    const idPlayer = id;    
+    const room = rooms.find(r => r.players.some(p => p.id === idPlayer && r.players.length < maxPlayersPerRoom));
+    console.log(room);
+    
+    if (room) {
+        room.players = room.players.filter(p => p.id !== idPlayer);
+        console.log(`jugadores en el room ${room.players}`)
+        if (room.players.length === 0) {
+            rooms.splice(rooms.indexOf(room), 1);
+        }
+    }
+};
+
 const startGame = (room: Room) => {
     let timeLeft = 60;
     room.timerId = setInterval(() => {
