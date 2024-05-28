@@ -11,7 +11,7 @@ const rooms: Room[] = [];
 const maxPlayersPerRoom = 2;
 
 export const handleMatchMaking = (io: Server, socket: Socket, { idPlayer, skin, name }): void => {
-    let availableRoom = rooms.find(p => p.players.length < maxPlayersPerRoom);
+    let availableRoom = rooms.find(p => p.players.length < maxPlayersPerRoom && !p.gameEnded);
     if (availableRoom) {
         availableRoom.players.push({ id: idPlayer, socket: socket, name: name, health: 100, skin: skin });
 
@@ -48,6 +48,7 @@ export const handleMatchMaking = (io: Server, socket: Socket, { idPlayer, skin, 
                                     players.socket.broadcast.emit('playerDied', { playerId, targetId: target.id });
                                     room.gameEnded = true;
                                     clearInterval(availableRoom.timerId);
+                                    endGame(availableRoom);
                                 }    
                             });
                             player.socket.broadcast.emit('attack', { playerId });
@@ -72,6 +73,7 @@ export const handleMatchMaking = (io: Server, socket: Socket, { idPlayer, skin, 
                 player.socket.on('winner', ({playerId, targetId}) => {
                     player.socket.broadcast.emit('congratsWinner', {targetId});
                     clearInterval(availableRoom.timerId);
+                    endGame(availableRoom);
                 });  
 
                 player.socket.on('sendJump', ({targetId}) => {
@@ -101,12 +103,10 @@ export const handleMatchMaking = (io: Server, socket: Socket, { idPlayer, skin, 
 
 export const handleCancelMatchMaking = (socket: Socket, { id }: { id: string }): void => {
     const idPlayer = id;    
-    const room = rooms.find(r => r.players.some(p => p.id === idPlayer && r.players.length < maxPlayersPerRoom));
-    console.log(room);
+    const room = rooms.find(r => r.players.some(p => p.id === idPlayer && r.players.length < maxPlayersPerRoom && !r.gameEnded));
     
     if (room) {
         room.players = room.players.filter(p => p.id !== idPlayer);
-        console.log(`jugadores en el room ${room.players}`)
         if (room.players.length === 0) {
             rooms.splice(rooms.indexOf(room), 1);
         }
@@ -125,6 +125,15 @@ const startGame = (room: Room) => {
             room.players.forEach(player => {
                 player.socket.emit('timeUp', { message: 'Time is up!' });
             });
+            room.gameEnded = true;
+            endGame(room);
         }
     }, 1000);
+};
+
+const endGame = (room: Room) => {
+    room.players.forEach(player => {
+        player.socket.emit('gameEnded', { roomId: room.id });
+    });
+    rooms.splice(rooms.indexOf(room), 1);
 };
