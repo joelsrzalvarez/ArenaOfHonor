@@ -54,6 +54,8 @@ v1.0
 - Each division will have different awards
 - Play with Mage!
 
+# Technical Description
+
 ## DATA MODEL
 
 ### Users
@@ -62,6 +64,20 @@ v1.0
 - surname( string, required)
 - email( string, required)
 - password( string, required)
+- inventory(Array, required)
+
+### Inventory
+
+- name(string, required)
+- quantity(number, required)
+- itemId(associated to the item bought at the shop)
+
+### Shop
+
+- name(string, required)
+- price(number, required)
+- type(Array, required)
+  - You can buy with arena_points or honor_points
 
 ### Characters
 
@@ -69,8 +85,6 @@ v1.0
 - class( string, required)
 - win_streak( number, required)
 - user_id( ObjectId, ref: 'User', required)
-
-## Technical Description
 
 ### Frontend
 
