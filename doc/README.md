@@ -68,8 +68,8 @@ v1.0
 
 ### Rooms
 
-- idHost(ObjectIt, required)
-- idGuest(ObjectIt, required)
+- idHost(ObjectId, required)
+- idGuest(ObjectId, required)
 - division(string, required)
 - startedAt(date, required)
 - endedAt(date, required)
