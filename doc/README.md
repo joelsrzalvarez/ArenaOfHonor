@@ -66,6 +66,15 @@ v1.0
 - password( string, required)
 - inventory(Array, required)
 
+### Rooms
+
+- idHost(ObjectIt, required)
+- idGuest(ObjectIt, required)
+- division(string, required)
+- startedAt(date, required)
+- endedAt(date, required)
+- winner(string, required)
+
 ### Inventory
 
 - name(string, required)
