@@ -27,6 +27,7 @@ function Home() {
     const [enabledSkinSelectors, setEnabledSkinSelectors] = useState({});
     const [eloImages, setEloImages] = useState({});
     const [eloClasses, setEloClasses] = useState({});
+    const [divisions, setDivisions] = useState({ host: '', guest: '' });
 
     useEffect(() => {
         const newSocket = io('ws://localhost:9000');
@@ -43,6 +44,7 @@ function Home() {
         newSocket.on('start', (data) => {
             console.log('Match found:', data);
             if (data.players.some(playerId => characterIds.has(playerId))) {
+                console.log('This client is part of the match');
                 setRoomId(data.roomId);
                 setPlayers(data.players);
                 setGameFound(true);
@@ -56,10 +58,17 @@ function Home() {
                     host: data.skins[0],
                     guest: data.skins[1]
                 };
+                // const selectedDivisions = {
+                //     host: data.divisions[0],
+                //     guest: data.divisions[1]
+                // };
                 setSkins(selectedSkins);
+                // setDivisions(selectedDivisions);
+            } else {
+                console.log('This client is not part of the match');
             }
         });
-
+    
         return () => {
             newSocket.off('connect');
             newSocket.off('disconnect');
@@ -77,7 +86,7 @@ function Home() {
                 setCharacters(chars);
                 const ids = new Set(chars.map(char => char._id));
                 setCharacterIds(ids);
-    
+
                 const elos = await getEloFromCharacter(userId);
                 const eloData = chars.reduce((acc, char, index) => {
                     const { img, class: eloClass } = getEloImageAndClass(elos[index]);
@@ -121,17 +130,18 @@ function Home() {
             const selectedCharacter = characters.find(char => char._id === id);
             const selectedSkin = skins[id] || selectedCharacter.clase.toLowerCase();
             const characterName = selectedCharacter ? selectedCharacter.name : 'Unknown';
-    
+
             if (!searching) {
                 socket.emit('findMatch', { id: id, skin: selectedSkin, name: characterName });
+                console.log({ id: id, skin: selectedSkin, name: characterName });
                 setSearching(true);
             } else {
                 socket.emit('cancelMatch', { id: id });
                 setSearching(false);
             }
         }
-    };    
-    
+    };
+
     const handleDeleteCharacterClick = () => {
         if (selectedCharacterId) {
             setShowConfirmDialog(true);
@@ -168,7 +178,6 @@ function Home() {
     const handleSelectSkin = (characterId, event) => {
         const name = event.target.value.toLowerCase().replace(/\s+/g, '').trim();
         setSkins(prevSkins => ({ ...prevSkins, [characterId]: name }));
-        //console.log('Selected skin for', characterId, ':', name);
     };
 
     const handleCancelDelete = () => {
@@ -236,7 +245,7 @@ function Home() {
                 return { img: '/assets/img/elo/default.png', class: 'elo-default' }; 
         }
     }
-    
+
     return (
         <div className="form-home">
             <div className="row">

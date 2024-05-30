@@ -7,6 +7,7 @@ import InventoryModal from '../components/InventoryModal';
 import './Navbar.css';
 import ArenaPoints from '../components/ArenaPoints';
 import Information from '../components/Information';
+import Profile from '../components/Profile';
 
 function Navbar({ onUserLoggedOut }) {
     const [user, setUser] = useState(null);
@@ -15,6 +16,7 @@ function Navbar({ onUserLoggedOut }) {
     const [showInventory, setShowInventory] = useState(false);
     const [showArenaPointsShop ,setShowArenaPointsShop] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
     let token = sessionStorage.getItem('token');
 
@@ -67,6 +69,12 @@ function Navbar({ onUserLoggedOut }) {
     const handleCloseInfo = () => {
         setShowInfo(false);
     }
+    const handleOpenProfile  = () => {
+        setShowProfile(true);
+    }
+    const handleCloseProfile  = () => {
+        setShowProfile(false);
+    }
 
     const updateUser = () => {
         if (token) {
@@ -118,8 +126,9 @@ function Navbar({ onUserLoggedOut }) {
                                     Welcome, {user.name}!
                                 </a>
                                 <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <a className="dropdown-item" onClick={handleOpenProfile} href="#"> 👤  | Profile</a>
                                     <a className="dropdown-item" onClick={handleOpenShop} href="#">🛒 | Shop</a>
-                                    <a className="dropdown-item" onClick={handleOpenInventory} href="#">🎒 | Inventory</a> {/* Opción de inventario */}
+                                    <a className="dropdown-item" onClick={handleOpenInventory} href="#">🎒 | Inventory</a>
                                     <a className="dropdown-item" onClick={handleOpenRanking} href="#">🏆 | Ranking</a>
                                     <a className="dropdown-item" href="#" onClick={handleLogoutClick}>❌ | Close session</a>
                                 </div>
@@ -133,7 +142,7 @@ function Navbar({ onUserLoggedOut }) {
             <InventoryModal show={showInventory} onClose={handleCloseInventory} />
             <ArenaPoints show={showArenaPointsShop} onClose={handleCloseBuyArenaPoints} onBuyItem={updateUser} />
             <Information show={showInfo} onClose={handleCloseInfo} />
-
+            <Profile show={showProfile} onClose={handleCloseProfile} />
         </>
     );
 }

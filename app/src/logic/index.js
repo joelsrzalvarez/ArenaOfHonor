@@ -14,6 +14,7 @@ import buyArenaPoints from './buyArenaPoints'
 import moveImage from './moveImage'
 import updateWins from './updateWins'
 import getEloFromCharacter from './getEloFromCharacter'
+import updateUserPassword from './updateUserPassword'
 
 const logic = {
     registerUser,
@@ -31,7 +32,8 @@ const logic = {
     buyArenaPoints,
     moveImage,
     updateWins,
-    getEloFromCharacter
+    getEloFromCharacter,
+    updateUserPassword
 }
 
 export default logic

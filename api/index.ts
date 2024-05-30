@@ -78,7 +78,24 @@ mongoose.connect(MONGODB_URL)
                 res.status(500).json({ error: SystemError.name, message: error.message })
             }
         }
-    })
+    });
+
+    api.put('/users/:userId/updatePassword', jsonBodyParser, async (req, res) => {
+        const { userId } = req.params;
+        const { password } = req.body;
+        try {
+            await logic.updateUserPassword(userId, password);
+            res.status(200).json({ message: 'Password updated successfully' });
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                console.warn(error.message);
+                res.status(404).json({ error: error.constructor.name, message: error.message });
+            } else {
+                console.error('Unexpected error occurred', error.message);
+                res.status(500).json({ error: SystemError.name, message: 'An unexpected error occurred' });
+            }
+        }
+    });
     
     api.post('/characters', jsonBodyParser, async (req, res) => {
         const { name, clase, win_streak, max_win_streak, user_id, page } = req.body;

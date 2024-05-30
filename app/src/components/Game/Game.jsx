@@ -23,7 +23,7 @@ function Game({ socket, roomId, characterIds, characters, players, playerNames, 
     const [guestHealth, setGuestHealth] = useState(100); 
 
     const [currentHostHealth, setCurrentHostHealth] = useState(100);
-    const [currentGuestHealth, setCurrentGuestHealth] = useState(100); 
+    const [currentGuestHealth, setCurrentGuestHealth] = useState(100);
 
     const { setShowLayout } = useLayout();
     const navigate = useNavigate();
@@ -135,34 +135,21 @@ function Game({ socket, roomId, characterIds, characters, players, playerNames, 
                 if (hostRef.current) {
                     hostRef.current.handleAction('hit');
                 }
-                setTimeout(() => {
-                    if (hostRef.current) {
-                        hostRef.current.handleAction('idle');
-                    }
-                }, hostRef.current?.sprites?.takeHit?.maxFrames * hostRef.current?.holdFrames * 1000 / 60);
             } else if (playerId === idGuest) {
                 setCurrentGuestHealth(health);
                 setGuestHealth(health * 4); 
                 if (guestRef.current) {
                     guestRef.current.handleAction('hit');
                 }
-                setTimeout(() => {
-                    if (guestRef.current) {
-                        guestRef.current.handleAction('idle');
-                    }
-                }, guestRef.current?.sprites?.takeHit?.maxFrames * guestRef.current?.holdFrames * 1000 / 60);
             }
         });
 
         socket.on('lifeBar', data => {
-            const { playerId, idHost, hostHealth, idGuest, guestHealth } = data;
-            if (currentPlayerId === idHost) {
-                setCurrentGuestHealth(guestHealth);
-                setGuestHealth(guestHealth * 4);
-            } else if (currentPlayerId === idGuest) {
-                setCurrentHostHealth(hostHealth);
-                setHostHealth(hostHealth * 4); 
-            }
+            const { idHost, hostHealth, idGuest, guestHealth } = data;
+            setCurrentHostHealth(hostHealth);
+            setHostHealth(hostHealth * 4);
+            setCurrentGuestHealth(guestHealth);
+            setGuestHealth(guestHealth * 4); 
         });
 
         socket.on('jump', data => {
@@ -202,24 +189,31 @@ function Game({ socket, roomId, characterIds, characters, players, playerNames, 
         });
 
         socket.on('playerDied', data => {
-            const { playerId, targetId } = data;
-            if (playerId === idHost && targetId === idGuest) { // gana el host
-                guestRef.current.handleAction('die');
-                guestRef.current = null;
-                socket.emit('winner', { playerId: idHost, targetId: idGuest });
-                setTimeout(() => {
-                    window.location.href = 'http://localhost:5173/';
-                }, 5000);
-            } else if (playerId === idGuest && targetId === idHost) { // gana el guest
-                hostRef.current.handleAction('die');
-                hostRef.current = null;
+            const { playerId, targetId, health } = data;
+            if (targetId === idHost) {
+                setCurrentHostHealth(0);
+                setHostHealth(0);
+                if (hostRef.current) {
+                    hostRef.current.handleAction('die');
+                    hostRef.current = null;
+                    setTimeout(() => {
+                        window.location.href = "http://localhost:5173";
+                    }, 5000)
+                }
                 socket.emit('winner', { playerId: idGuest, targetId: idHost });
-                setTimeout(() => {
-                    window.location.href = 'http://localhost:5173/';
-                }, 5000);
+            } else if (targetId === idGuest) {
+                setCurrentGuestHealth(0);
+                setGuestHealth(0);
+                if (guestRef.current) {
+                    guestRef.current.handleAction('die');
+                    guestRef.current = null;
+                    setTimeout(() => {
+                        window.location.href = "http://localhost:5173";
+                    }, 5000)
+                }
+                socket.emit('winner', { playerId: idHost, targetId: idGuest });
             }
         });
-
         socket.on('congratsWinner', async data => {
             const { playerId } = data;
             try {

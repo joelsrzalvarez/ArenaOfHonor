@@ -11,6 +11,7 @@ import buyItem from './buyItem.ts'
 import buyArenaPoints from './buyArenaPoints.ts'
 import updateWins from './updateWins.ts';
 import getEloFromCharacter from './getEloFromCharacter.ts'
+import updateUserPassword from './updateUserPassword.ts'
 
 const logic = {
     registerUser,
@@ -26,7 +27,8 @@ const logic = {
     buyItem,
     buyArenaPoints,
     updateWins,
-    getEloFromCharacter
+    getEloFromCharacter,
+    updateUserPassword
 }
 
 export default logic
