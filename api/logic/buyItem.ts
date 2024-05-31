@@ -38,7 +38,7 @@ async function buyItem(userId, itemId) {
 
         await user.save();
     } catch (error) {
-        throw new SystemError(error.message); // Enviar solo el mensaje de error
+        throw new SystemError(error.message);
     }
 }
 

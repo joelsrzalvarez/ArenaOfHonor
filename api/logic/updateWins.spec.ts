@@ -40,7 +40,7 @@ describe('updateWins', () => {
     });
 
     it('fails if an error occurs during the update', async () => {
-        const playerId = 'invalidPlayerId';  // This will cause a cast error
+        const playerId = 'invalidPlayerId';  
 
         try {
             await logic.updateWins(playerId);

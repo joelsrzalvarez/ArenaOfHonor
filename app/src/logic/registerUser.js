@@ -1,12 +1,23 @@
 import { validate, errors } from 'com'
 
-function registerUser(name, surname, email, password, honor_points, arena_points) {
+function registerUser(name, surname, email, password, honor_points, arena_points, vip, avatar) {
     validate.text(name, 'name')
     validate.text(surname, 'surname')
     validate.email(email)
     validate.password(password)
+    validate.text(avatar, 'avatar')
 
-    const user = { name, surname, email, password, honor_points, arena_points }
+    const user = { 
+        name, 
+        surname, 
+        email, 
+        password, 
+        honor_points, 
+        arena_points, 
+        vip, 
+        avatar,
+        friends: []
+    }
 
     const json = JSON.stringify(user)
 

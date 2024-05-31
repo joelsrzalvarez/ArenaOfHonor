@@ -8,7 +8,7 @@ import { validate, errors } from 'com';
 
 const { NotFoundError, SystemError } = errors;
 
-function retrieveUser(userId: string, targetUserId: string): Promise<{ name: string, email: string, honor_points: number, arena_points: number, inventory: Array<{ itemId: string, name: string, quantity: number }> }> {
+function retrieveUser(userId: string, targetUserId: string): Promise<{ name: string, password: string, email: string, honor_points: number, arena_points: number, avatar: string, inventory: Array<{ itemId: string, name: string, quantity: number }> }> {
     validate.text(userId, 'userId', true);
     validate.text(targetUserId, 'targetUserId', true);
 
@@ -17,7 +17,7 @@ function retrieveUser(userId: string, targetUserId: string): Promise<{ name: str
         .then(user => {
             if (!user) throw new NotFoundError('user not found');
 
-            return User.findById(targetUserId).select('-_id name email honor_points arena_points inventory').lean();
+            return User.findById(targetUserId).select('-_id name password email honor_points arena_points avatar inventory').lean();
         })
         .then(user => {
             if (!user) throw new NotFoundError('target user not found');
@@ -30,10 +30,12 @@ function retrieveUser(userId: string, targetUserId: string): Promise<{ name: str
 
             return {
                 name: user.name,
+                password: user.password,
                 email: user.email,
                 honor_points: user.honor_points,
                 arena_points: user.arena_points,
-                inventory: inventory
+                avatar: user.avatar,
+                inventory: inventory,
             };
         });
 }

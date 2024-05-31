@@ -8,6 +8,9 @@ type UserType = {
     honor_points: number;
     arena_points: number;
     inventory: Array<InventoryItemType>;
+    vip: boolean;         
+    avatar: string;
+    friends: mongoose.Types.ObjectId[];
 };
 
 type InventoryItemType = {
@@ -116,7 +119,21 @@ const userSchema = new Schema<UserType>({
         type: Number,
         required: true
     },
-    inventory: [inventoryItemSchema]
+    inventory: [inventoryItemSchema],
+    vip: {
+        type: Boolean,
+        default: false
+    },
+    avatar: {
+        type: String,
+        default: '',
+        required: true
+    },
+    friends: { 
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        default: []
+    }
 });
 
 const createCharacterSchema = new Schema<CreateCharacterType>({
@@ -195,7 +212,6 @@ const roomSchema = new Schema<RoomDocument>({
         default: false
     }
 });
-
 
 const User = model<UserType & Document>('User', userSchema);
 const Character = model<Character & Document>('Character', createCharacterSchema);

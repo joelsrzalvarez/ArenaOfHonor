@@ -12,6 +12,8 @@ import buyArenaPoints from './buyArenaPoints.ts'
 import updateWins from './updateWins.ts';
 import getEloFromCharacter from './getEloFromCharacter.ts'
 import updateUserPassword from './updateUserPassword.ts'
+import getEmailFriendRequest from './getEmailFriendRequest.ts'
+import sendFriendRequest from './sendFriendRequest.ts'
 
 const logic = {
     registerUser,
@@ -28,7 +30,9 @@ const logic = {
     buyArenaPoints,
     updateWins,
     getEloFromCharacter,
-    updateUserPassword
+    updateUserPassword,
+    getEmailFriendRequest,
+    sendFriendRequest
 }
 
 export default logic

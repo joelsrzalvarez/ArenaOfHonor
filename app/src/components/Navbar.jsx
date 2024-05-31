@@ -14,7 +14,7 @@ function Navbar({ onUserLoggedOut }) {
     const [showRanking, setShowRanking] = useState(false);
     const [showShop, setShowShop] = useState(false);
     const [showInventory, setShowInventory] = useState(false);
-    const [showArenaPointsShop ,setShowArenaPointsShop] = useState(false);
+    const [showArenaPointsShop, setShowArenaPointsShop] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
 
@@ -32,11 +32,11 @@ function Navbar({ onUserLoggedOut }) {
 
     const handleBuyArenaPoints = () => {
         setShowArenaPointsShop(true);
-    }
+    };
 
     const handleCloseBuyArenaPoints = () => {
         setShowArenaPointsShop(false);
-    }
+    };
 
     const handleOpenRanking = () => {
         setShowRanking(true);
@@ -64,17 +64,19 @@ function Navbar({ onUserLoggedOut }) {
 
     const handleOpenInfo = () => {
         setShowInfo(true);
-    }
+    };
 
     const handleCloseInfo = () => {
         setShowInfo(false);
-    }
-    const handleOpenProfile  = () => {
+    };
+
+    const handleOpenProfile = () => {
         setShowProfile(true);
-    }
-    const handleCloseProfile  = () => {
+    };
+
+    const handleCloseProfile = () => {
         setShowProfile(false);
-    }
+    };
 
     const updateUser = () => {
         if (token) {
@@ -94,6 +96,7 @@ function Navbar({ onUserLoggedOut }) {
 
     return (
         <>
+            {console.log(user)}
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div className="container-fluid">
                     <a className="navbar-brand" onClick={handleOpenInfo} href="#">⚔️</a>
@@ -119,6 +122,9 @@ function Navbar({ onUserLoggedOut }) {
                             </li>
                         </ul>
                     </div>
+                    {user  && (
+                        <img src={user.avatar} width='40' height='40' style={{ borderRadius: '50%', objectFit: 'cover' }} alt="User Avatar" />
+                    )}
                     <div className='user-token'>
                         {user && (
                             <div className="dropdown show">

@@ -15,9 +15,11 @@ function Register ({onUserRegistered, onLoginClick}) {
         const password = form.password.value
         const honor_points = 0
         const arena_points = 0
+        const vip = false
+        const avatar = form.avatar.value
 
         try {
-            logic.registerUser(name, surname, email, password, honor_points, arena_points)
+            logic.registerUser(name, surname, email, password, honor_points, arena_points, vip, avatar)
             .then(() => {
                     form.reset()
 
@@ -58,6 +60,9 @@ function Register ({onUserRegistered, onLoginClick}) {
                   </div> */}
                   <div className="mb-3">
                     <input type="password" className="form-control" id="password" placeholder="Password" />
+                  </div>
+                  <div className="mb-3">
+                    <input type="text" className="form-control" id="avatar" placeholder="Avatar" />
                   </div>
                   <button type="submit" className="btn btn-primary w-100">Register</button>
                   <div className="text-center mt-2">

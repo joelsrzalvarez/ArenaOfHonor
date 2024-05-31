@@ -43,6 +43,7 @@ export const handleMatchMaking = async (io: Server, socket: Socket, { idPlayer, 
     }, null, 2) : 'None');
 
     if (availableRoom) {
+        // ensure player is not already in the room
         const isPlayerAlreadyInRoom = availableRoom.players.some(player => player.id === idPlayer);
         console.log(`Is player already in room: ${isPlayerAlreadyInRoom}`);
         if (!isPlayerAlreadyInRoom) {
@@ -67,7 +68,7 @@ export const handleMatchMaking = async (io: Server, socket: Socket, { idPlayer, 
         }
     } else {
         console.log(`No available room found, creating a new room for player ${idPlayer}`);
-        const division = 'bronze';
+        const division = 'bronze';  // TODO Get division from ELO emit
         const newRoom = await createNewRoom({ id: idPlayer, socket, name, health: 100, skin }, division);
         rooms.push(newRoom);
         console.log(`New room ${newRoom.id} created for player ${idPlayer}`);
@@ -88,7 +89,6 @@ export const handleCancelMatchMaking = async (socket: Socket, { id }: { id: stri
 const addPlayerToRoom = (room: GameRoom, player: Player): void => {
     room.players.push(player);
     console.log(`Player ${player.id} added to room ${room.id}`);
-    player.socket.join(room.id);  // Join the room in Socket.IO
 };
 
 const createNewRoom = async (player: Player, division: string): Promise<GameRoom> => {
@@ -101,13 +101,13 @@ const createNewRoom = async (player: Player, division: string): Promise<GameRoom
     console.log(`New room created with ID ${newRoom._id}`);
     return {
         id: newRoom._id.toString(),
-        players: [player],
+        players: [player],  // add the player here avoids adding twice
         gameEnded: false
     };
 };
 
 const startMatch = (io: Server, room: GameRoom): void => {
-    io.to(room.id).emit('start', {
+    io.emit('start', {
         roomId: room.id,
         players: room.players.map(player => player.id),
         names: room.players.map(player => player.name),
@@ -115,54 +115,55 @@ const startMatch = (io: Server, room: GameRoom): void => {
         message: `Match found in room ${room.id}`
     });
 
-    startGame(io, room);
+    startGame(room);
 
     room.players.forEach(player => {
-        setupPlayerEventHandlers(io, player, room);
+        setupPlayerEventHandlers(player, room);
     });
 };
 
-const setupPlayerEventHandlers = (io: Server, player: Player, room: GameRoom): void => {
+const setupPlayerEventHandlers = (player: Player, room: GameRoom): void => {
     player.socket.on('moveBox', (data) => {
         const { playerId, direction, positionX } = data;
-        io.to(room.id).emit('boxMoved', { playerId, direction, positionX });
+        player.socket.broadcast.emit('boxMoved', { playerId, direction, positionX });
     });
 
     player.socket.on('attack', ({ playerId, roomId, targetId }) => {
-        handleAttack(io, room, playerId, roomId, targetId);
+        handleAttack(room, playerId, roomId, targetId);
     });
 
     player.socket.on('startGame', (roomId) => {
         if (roomId === room.id) {
-            startGame(io, room);
+            startGame(room);
         }
     });
 
     player.socket.on('sendAttack', ({ playerId }) => {
-        io.to(room.id).emit('playerAttack', { playerId });
+        player.socket.broadcast.emit('playerAttack', { playerId });
     });
 
     player.socket.on('sendHit', ({ playerId }) => {
-        io.to(room.id).emit('playerHit', { playerId });
+        player.socket.broadcast.emit('playerHit', { playerId });
     });
 
     player.socket.on('winner', async ({ playerId }) => {
         room.winner = playerId;
+        player.socket.broadcast.emit('congratsWinner', {playerId});
         console.log(room.winner)
         clearInterval(room.timerId);
-        await endGame(io, room);
+        await endGame(room);
     });
 
     player.socket.on('sendJump', ({ targetId }) => {
-        io.to(room.id).emit('jump', { targetId });
+        player.socket.broadcast.emit('jump', { targetId });
     });
 
     player.socket.on('disconnect', () => {
-        handlePlayerDisconnect(io, room, player);
+        handlePlayerDisconnect(room, player);
     });
 };
 
-const handleAttack = (io: Server, room: GameRoom, playerId: string, roomId: string, targetId: string): void => {
+const handleAttack = (room: GameRoom, playerId: string, roomId: string, targetId: string): void => {
     if (room.id === roomId && !room.gameEnded) {
         const target = room.players.find(player => player.id === targetId);
         if (target) {
@@ -173,18 +174,22 @@ const handleAttack = (io: Server, room: GameRoom, playerId: string, roomId: stri
                     idHost: room.players[0].id,
                     hostHealth: room.players[0].health,
                     idGuest: room.players[1].id,
-                    guestHealth: room.players[1].health
+                    guestHealth: room.players[1].health,
                 });
             });
 
             if (target.health <= 0) {
-                io.to(room.id).emit('playerDied', { playerId, targetId: target.id });
+                room.players.forEach(player => {
+                    player.socket.emit('playerDied', { playerId, targetId: target.id, health: target.health });
+                });
                 room.winner = playerId;
                 room.gameEnded = true;
                 clearInterval(room.timerId);
-                endGame(io, room);
+                endGame(room);
             } else {
-                io.to(room.id).emit('playerAttacked', { playerId: targetId, health: target.health });
+                room.players.forEach(player => {
+                    player.socket.emit('playerAttacked', { playerId: targetId, health: target.health });
+                });
             }
         }
     }
@@ -199,7 +204,7 @@ const removePlayerFromRoom = async (room: GameRoom, playerId: string): Promise<v
     }
 };
 
-const handlePlayerDisconnect = async (io: Server, room: GameRoom, player: Player): Promise<void> => {
+const handlePlayerDisconnect = async (room: GameRoom, player: Player): Promise<void> => {
     if (room.players.length === 0) {
         clearInterval(room.timerId);
     } else {
@@ -216,7 +221,7 @@ const handlePlayerDisconnect = async (io: Server, room: GameRoom, player: Player
     }
 };
 
-const startGame = (io: Server, room: GameRoom): void => {
+const startGame = (room: GameRoom): void => {
     let timeLeft = 60;
     room.timerId = setInterval(() => {
         timeLeft--;
@@ -229,13 +234,12 @@ const startGame = (io: Server, room: GameRoom): void => {
                 player.socket.emit('timeUp', { message: 'Time is up!' });
             });
             room.gameEnded = true;
-            endGame(io, room); // Asegúrate de pasar ambos argumentos aquí
+            endGame(room);
         }
     }, 1000);
 };
 
-
-const endGame = async (io: Server, room: GameRoom): Promise<void> => {
+const endGame = async (room: GameRoom): Promise<void> => {
     room.players.forEach(player => {
         player.socket.emit('gameEnded', { roomId: room.id, winner: room.winner });
     });
@@ -246,6 +250,4 @@ const endGame = async (io: Server, room: GameRoom): Promise<void> => {
         roomDocument.winner = new mongoose.Types.ObjectId(room.winner);
         await roomDocument.save();
     }
-    rooms.splice(rooms.indexOf(room), 1);
-    console.log(`Room ${room.id} ended and deleted.`);
 };

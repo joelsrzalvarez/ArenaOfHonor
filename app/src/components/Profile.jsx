@@ -4,6 +4,7 @@ import logic from '../logic';
 function Profile({ show, onClose }) {
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
+    const [avatar, setAvatar] = useState();
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
@@ -13,6 +14,7 @@ function Profile({ show, onClose }) {
             if (token) {
                 logic.retrieveUser(token)
                     .then(data => {
+                        setAvatar(data.avatar)
                         setPassword('');
                         setRepeatPassword('');
                     })

@@ -23,6 +23,25 @@
     margin: 10px 0;
 }
 
+.form-home {
+    position: relative;
+}
+
+.chat-btn-container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 20px;
+}
+
+.chat-btn {
+    padding: 5px 20px;
+    border-radius: 5px;
+    color: black;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .character-card .character-icon {
     width: 80px;
     height: 80px;

@@ -8,7 +8,10 @@ import retrieveUser from '../logic/retrieveUser';
 import decryptToken from '../logic/decryptToken';
 import getEloFromCharacter from '../logic/getEloFromCharacter';
 import Game from '../components/Game/Game';
+import Chat from '../components/Friends';
+
 import './Home.css';
+import Friends from '../components/Friends';
 
 function Home() {
     const [characters, setCharacters] = useState([]);
@@ -28,6 +31,7 @@ function Home() {
     const [eloImages, setEloImages] = useState({});
     const [eloClasses, setEloClasses] = useState({});
     const [divisions, setDivisions] = useState({ host: '', guest: '' });
+    const [showChatModal, setShowChatModal] = useState(false);
 
     useEffect(() => {
         const newSocket = io('ws://localhost:9000');
@@ -246,6 +250,14 @@ function Home() {
         }
     }
 
+    const handleOpenChat= () => {
+        setShowChatModal(true);
+    }
+
+    const handleCloseChat = ()  => {
+        setShowChatModal(false);
+    }
+
     return (
         <div className="form-home">
             <div className="row">
@@ -310,6 +322,9 @@ function Home() {
                     </button>
                 </div>
             </div>
+            <div className="chat-btn-container">
+                <button onClick={handleOpenChat} className='chat-btn'>💬 Chat</button>
+            </div>
             <CreateCharacterForm onClose={handleCloseCreateCharacter} showModal={showCreateCharacter} onCharacterCreated={handleCharacterCreated} />
             <ConfirmDialog 
                 show={showConfirmDialog} 
@@ -317,6 +332,7 @@ function Home() {
                 onConfirm={handleConfirmDelete} 
                 onCancel={handleCancelDelete} 
             />
+            <Friends show={showChatModal} onClose={handleCloseChat} />
         </div>
     );
 }    

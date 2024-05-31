@@ -52,9 +52,9 @@ mongoose.connect(MONGODB_URL)
 
     api.post('/users', jsonBodyParser, (req, res) => {
         try {
-            const { name, surname, email, password, honor_points, arena_points } = req.body
+            const { name, surname, email, password, honor_points, arena_points, vip, avatar } = req.body
 
-            logic.registerUser(name, surname, email, password, honor_points, arena_points)
+            logic.registerUser(name, surname, email, password, honor_points, arena_points, vip, avatar)
                 .then(() => res.status(201).send())
                 .catch(error => {
                     if (error instanceof SystemError) {
@@ -302,6 +302,30 @@ mongoose.connect(MONGODB_URL)
             }
         }
     });
+
+    api.get('/users/email/:email', jsonBodyParser, async (req, res) => {
+        const { email } = req.params;
+    
+        try {
+            const userId = await logic.getEmailFriendRequest(email);
+            console.log(userId)
+            res.status(200).json({userId});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+    
+    api.post('/friends/request', jsonBodyParser, async (req, res) => {
+        const { userId, friendId } = req.body;
+    
+        try {
+            const result = await logic.sendFriendRequest(userId, friendId);
+            res.status(200).json({result});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+    
 
     io.on('connection', (socket) => {    
         socket.on('findMatch', ({ id, skin, name }) => {
