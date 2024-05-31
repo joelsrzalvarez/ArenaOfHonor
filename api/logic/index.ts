@@ -14,6 +14,9 @@ import getEloFromCharacter from './getEloFromCharacter.ts'
 import updateUserPassword from './updateUserPassword.ts'
 import getEmailFriendRequest from './getEmailFriendRequest.ts'
 import sendFriendRequest from './sendFriendRequest.ts'
+import { acceptFriendRequest, rejectFriendRequest } from './acceptFriendRequest.ts'
+import retrievePendingFriendRequests from './retrievePendingFriendRequests.ts'
+import retrieveFriends from './retrieveFriends.ts'
 
 const logic = {
     registerUser,
@@ -32,7 +35,11 @@ const logic = {
     getEloFromCharacter,
     updateUserPassword,
     getEmailFriendRequest,
-    sendFriendRequest
+    sendFriendRequest,
+    acceptFriendRequest,
+    rejectFriendRequest,
+    retrievePendingFriendRequests,
+    retrieveFriends
 }
 
 export default logic

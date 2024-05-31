@@ -325,7 +325,50 @@ mongoose.connect(MONGODB_URL)
             res.status(500).json({ message: error.message });
         }
     });
+
+    api.get('/friends/pending/:userId', jsonBodyParser, async (req, res) => {
+        const { userId } = req.params;
     
+        try {
+            const pendingRequests = await logic.retrievePendingFriendRequests(userId);
+            res.status(200).json({pendingRequests});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+
+    api.post('/friends/accept', jsonBodyParser, async (req, res) => {
+        const { userId, friendId } = req.body;
+        
+        try {
+            const result = await logic.acceptFriendRequest(userId, friendId);
+            res.status(200).json({result});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+    
+    api.post('/friends/reject', jsonBodyParser, async (req, res) => {
+        const { userId, friendId } = req.body;
+    
+        try {
+            const result = await logic.rejectFriendRequest(userId, friendId);
+            res.status(200).json({result});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+
+    api.get('/friends/:userId', async (req, res) => {
+        const { userId } = req.params;
+
+        try {
+            const friends = await logic.retrieveFriends(userId);
+            res.status(200).json(friends);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
 
     io.on('connection', (socket) => {    
         socket.on('findMatch', ({ id, skin, name }) => {

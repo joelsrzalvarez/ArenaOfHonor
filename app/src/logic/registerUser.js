@@ -16,7 +16,8 @@ function registerUser(name, surname, email, password, honor_points, arena_points
         arena_points, 
         vip, 
         avatar,
-        friends: []
+        friends: [],
+        pendingFriendRequests: []
     }
 
     const json = JSON.stringify(user)

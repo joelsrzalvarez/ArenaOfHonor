@@ -15,7 +15,10 @@ import moveImage from './moveImage';
 import updateWins from './updateWins';
 import getEloFromCharacter from './getEloFromCharacter';
 import updateUserPassword from './updateUserPassword';
-import sendFriendRequest from './sendFriendRequest'; 
+import sendFriendRequest from './sendFriendRequest';
+import { acceptFriendRequest, rejectFriendRequest } from './acceptFriendRequest';
+import retrievePendingFriendRequests from './retrievePendingFriendRequests';
+import retrieveFriends from './retrieveFriends';
 
 const logic = {
     registerUser,
@@ -35,7 +38,11 @@ const logic = {
     updateWins,
     getEloFromCharacter,
     updateUserPassword,
-    sendFriendRequest
+    sendFriendRequest,
+    acceptFriendRequest,
+    rejectFriendRequest,
+    retrievePendingFriendRequests,
+    retrieveFriends
 };
 
 export default logic;

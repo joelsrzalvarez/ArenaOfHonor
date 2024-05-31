@@ -9,13 +9,18 @@ async function sendFriendRequest(userId, friendId) {
             throw new Error('User not found');
         }
 
-        if (!user.friends.includes(friendId)) {
-            user.friends.push(friendId);
-            await user.save();
+        if (!user.friends) {
+            user.friends = [];
+        }
+        if (!friend.friends) {
+            friend.friends = [];
+        }
+        if (!friend.pendingFriendRequests) {
+            friend.pendingFriendRequests = [];
         }
 
-        if (!friend.friends.includes(userId)) {
-            friend.friends.push(userId);
+        if (!friend.pendingFriendRequests.includes(userId)) {
+            friend.pendingFriendRequests.push(userId);
             await friend.save();
         }
 

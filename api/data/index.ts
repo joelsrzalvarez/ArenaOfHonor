@@ -11,6 +11,7 @@ type UserType = {
     vip: boolean;         
     avatar: string;
     friends: mongoose.Types.ObjectId[];
+    pendingFriendRequests: mongoose.Types.ObjectId[];
 };
 
 type InventoryItemType = {
@@ -130,6 +131,11 @@ const userSchema = new Schema<UserType>({
         required: true
     },
     friends: { 
+        type: [Schema.Types.ObjectId],
+        ref: 'User',
+        default: []
+    },
+    pendingFriendRequests: { 
         type: [Schema.Types.ObjectId],
         ref: 'User',
         default: []

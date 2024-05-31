@@ -33,7 +33,9 @@ function registerUser(
                 arena_points: arena_points,
                 vip: vip,
                 avatar: avatar,
-                friends: []
+                inventory: [],
+                friends: [],
+                pendingFriendRequests: []
             }
 
             return User.create(user)
