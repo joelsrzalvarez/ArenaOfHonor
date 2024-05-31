@@ -65,6 +65,10 @@ v1.0
 - email( string, required)
 - password( string, required)
 - inventory(Array, required)
+- vip(boolean)
+- avatar(string, required)
+- friends(array)
+- pendingFriendRequests(array)
 
 ### Rooms
 
