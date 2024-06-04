@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import logic from '../logic';
 import './Friends.css';
 
@@ -11,6 +12,7 @@ function Friends({ show, onClose }) {
     const [pendingRequests, setPendingRequests] = useState([]);
     const [friends, setFriends] = useState([]);
     const [selectedFriend, setSelectedFriend] = useState(null);
+    const senderId = logic.decryptToken(sessionStorage.getItem('token')).sub;
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -30,9 +32,8 @@ function Friends({ show, onClose }) {
     const handleSendMessage = async () => {
         if (message.trim() !== '' && selectedFriend) {
             try {
-                const senderId = logic.decryptToken(sessionStorage.getItem('token')).sub;
                 const result = await logic.sendMessage(senderId, selectedFriend, message);
-                setMessages([...messages, { text: message, sender: 'me' }]);
+                setMessages([...messages, { text: message, sender: senderId, sentAt: new Date() }]);
                 setMessage('');
             } catch (error) {
                 alert(`Failed to send message: ${error.message}`);
@@ -90,12 +91,16 @@ function Friends({ show, onClose }) {
 
     const handleChatWithFriend = async (friendId) => {
         try {
-            const messages = await logic.retrieveMessages(friendId);
+            const messages = await logic.retrieveMessages(senderId, friendId);
             setMessages(messages);
             setSelectedFriend(friendId);
         } catch (error) {
             alert(`Failed to retrieve messages: ${error.message}`);
         }
+    };
+
+    const formatSentAt = (dateString) => {
+        return format(new Date(dateString), 'HH:mm');
     };
 
     if (!show) {
@@ -144,21 +149,29 @@ function Friends({ show, onClose }) {
                             ))
                         ) : (
                             messages.map((msg, index) => (
-                                <div key={index} className="chat-message">{msg.text}</div>
+                                <div 
+                                    key={index} 
+                                    className={`chat-message ${msg.sender === senderId ? 'sent-message' : 'received-message'}`}
+                                >
+                                    {msg.text}
+                                    <span className="date-chat">{formatSentAt(msg.sentAt)}</span>
+                                </div>
                             ))
                         )}
                     </div>
                 </div>
-                <div className="chat-footer">
-                    <input 
-                        type="text" 
-                        value={message} 
-                        onChange={(e) => setMessage(e.target.value)} 
-                        className="chat-input" 
-                        placeholder="Type a message"
-                    />
-                    <button onClick={handleSendMessage} className="send-btn">Send</button>
-                </div>
+                {selectedFriend && (
+                    <div className="chat-footer">
+                        <input 
+                            type="text" 
+                            value={message} 
+                            onChange={(e) => setMessage(e.target.value)} 
+                            className="chat-input" 
+                            placeholder="Type a message"
+                        />
+                        <button onClick={handleSendMessage} className="send-btn">Send</button>
+                    </div>
+                )}
             </div>
         </div>
     );

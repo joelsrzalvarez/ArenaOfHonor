@@ -89,11 +89,30 @@
     background-color: #0056b3;
 }
 
-.chat-message {
-    margin-bottom: 10px;
-    padding: 5px;
+.sent-message {
+    background-color: #c9f7ab;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+    align-self: flex-end;
+    position: relative;
+}
+
+.received-message {
     background-color: #e9ecef;
-    border-radius: 3px;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+    align-self: flex-start;
+    position: relative;
+}
+
+.date-chat {
+    font-size: 0.6em;
+    color: #6c757d;
+    position: absolute;
+    bottom: 0px;
+    right: 5px;
 }
 
 .close-btn {
