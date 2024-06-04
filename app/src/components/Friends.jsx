@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import React, { useState, useEffect, useRef } from 'react';
 import logic from '../logic';
 import './Friends.css';
+import { format } from 'date-fns';
 
 function Friends({ show, onClose }) {
     const [messages, setMessages] = useState([]);
@@ -13,6 +13,7 @@ function Friends({ show, onClose }) {
     const [friends, setFriends] = useState([]);
     const [selectedFriend, setSelectedFriend] = useState(null);
     const senderId = logic.decryptToken(sessionStorage.getItem('token')).sub;
+    const chatWindowRef = useRef(null);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -29,10 +30,33 @@ function Friends({ show, onClose }) {
         }
     }, [show]);
 
+    useEffect(() => {
+        let interval;
+        if (selectedFriend) {
+            interval = setInterval(async () => {
+                try {
+                    const messages = await logic.retrieveMessages(senderId, selectedFriend);
+                    setMessages(messages);
+                } catch (error) {
+                    console.error('Failed to retrieve messages:', error);
+                }
+            }, 5000); // Actualizar cada 5 segundos
+        }
+
+        return () => clearInterval(interval);
+    }, [selectedFriend, senderId]);
+
+    useEffect(() => {
+        if (chatWindowRef.current) {
+            chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+        }
+    }, [messages]);
+
     const handleSendMessage = async () => {
         if (message.trim() !== '' && selectedFriend) {
             try {
-                const result = await logic.sendMessage(senderId, selectedFriend, message);
+                await logic.sendMessage(senderId, selectedFriend, message);
+                // Actualizar la lista de mensajes localmente
                 setMessages([...messages, { text: message, sender: senderId, sentAt: new Date() }]);
                 setMessage('');
             } catch (error) {
@@ -127,7 +151,7 @@ function Friends({ show, onClose }) {
                             ))}
                         </ul>
                     </div>
-                    <div className="chat-window">
+                    <div className="chat-window" ref={chatWindowRef}>
                         {showFriendRequestForm ? (
                             <form onSubmit={handleFriendRequestSubmit} className="friend-request-form">
                                 <input 

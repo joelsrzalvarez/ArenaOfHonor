@@ -96,6 +96,7 @@
     margin: 5px 0;
     align-self: flex-end;
     position: relative;
+    max-width: 60%;
 }
 
 .received-message {
@@ -105,14 +106,22 @@
     margin: 5px 0;
     align-self: flex-start;
     position: relative;
+    max-width: 60%;
 }
 
 .date-chat {
-    font-size: 0.6em;
-    color: #6c757d;
+    font-size: 0.8em;
+    color: #888;
     position: absolute;
-    bottom: 0px;
+    bottom: 2px;
     right: 5px;
+}
+
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: auto; 
 }
 
 .close-btn {
