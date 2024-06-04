@@ -111,6 +111,7 @@ v1.0
 - Vite
 - ESlint
 - Socket.io.client
+- date-fns
 
 ### Backend
 
