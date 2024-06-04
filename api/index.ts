@@ -370,6 +370,28 @@ mongoose.connect(MONGODB_URL)
         }
     });
 
+    api.post('/chats/send', jsonBodyParser, async (req, res) => {
+        const { senderId, recipientId, text } = req.body;
+    
+        try {
+            const result = await logic.sendMessage(senderId, recipientId, text);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+
+    api.get('/chats/:senderId/:recipientId', async (req, res) => {
+        const { senderId, recipientId } = req.params;
+
+        try {
+            const messages = await logic.retrieveMessages(senderId, recipientId);
+            res.status(200).json(messages);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+
     io.on('connection', (socket) => {    
         socket.on('findMatch', ({ id, skin, name }) => {
             logic.handleMatchMaking(io, socket, { idPlayer: id, skin: skin, name: name });

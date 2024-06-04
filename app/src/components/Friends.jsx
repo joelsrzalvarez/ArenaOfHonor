@@ -7,10 +7,10 @@ function Friends({ show, onClose }) {
     const [message, setMessage] = useState('');
     const [showFriendRequestForm, setShowFriendRequestForm] = useState(false);
     const [showPendingFriendRequests, setShowPendingFriendRequests] = useState(false);
-    const [chat, setChat] = useState(false);
     const [friendRequest, setFriendRequest] = useState('');
     const [pendingRequests, setPendingRequests] = useState([]);
     const [friends, setFriends] = useState([]);
+    const [selectedFriend, setSelectedFriend] = useState(null);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -27,17 +27,22 @@ function Friends({ show, onClose }) {
         }
     }, [show]);
 
-    const handleSendMessage = () => {
-        if (message.trim() !== '') {
-            setMessages([...messages, message]);
-            setMessage('');
+    const handleSendMessage = async () => {
+        if (message.trim() !== '' && selectedFriend) {
+            try {
+                const senderId = logic.decryptToken(sessionStorage.getItem('token')).sub;
+                const result = await logic.sendMessage(senderId, selectedFriend, message);
+                setMessages([...messages, { text: message, sender: 'me' }]);
+                setMessage('');
+            } catch (error) {
+                alert(`Failed to send message: ${error.message}`);
+            }
         }
     };
 
     const handleSendFriendRequest = () => {
         setShowFriendRequestForm(true);
         setShowPendingFriendRequests(false);
-        setChat(false);
     };
 
     const handlePendingFriendRequest = async () => {
@@ -46,16 +51,9 @@ function Friends({ show, onClose }) {
             setPendingRequests(Array.isArray(pendingRequests) ? pendingRequests : []);
             setShowPendingFriendRequests(true);
             setShowFriendRequestForm(false);
-            setChat(false);
         } catch (error) {
             alert(error.message);
         }
-    };
-
-    const handleChatMenu = () => {
-        setShowFriendRequestForm(false);
-        setShowPendingFriendRequests(false);
-        setChat(true);
     };
 
     const handleFriendRequestSubmit = async (e) => {
@@ -90,9 +88,15 @@ function Friends({ show, onClose }) {
         }
     };
 
-    const handleOpenConversation = async (id) => {
-        alert(id)
-    }
+    const handleChatWithFriend = async (friendId) => {
+        try {
+            const messages = await logic.retrieveMessages(friendId);
+            setMessages(messages);
+            setSelectedFriend(friendId);
+        } catch (error) {
+            alert(`Failed to retrieve messages: ${error.message}`);
+        }
+    };
 
     if (!show) {
         return null;
@@ -106,7 +110,7 @@ function Friends({ show, onClose }) {
                     <button className="close-btn" onClick={onClose}>&times;</button>
                 </div>
                 <div className="friends-header">
-                    <button onClick={handleChatMenu}>Chat</button>
+                    <button onClick={() => setShowFriendRequestForm(false)}>Chat</button>
                     <button onClick={handleSendFriendRequest}>Send friend request</button>
                     <button onClick={handlePendingFriendRequest}>Pending request</button>
                 </div>
@@ -114,7 +118,7 @@ function Friends({ show, onClose }) {
                     <div className="friends-list">
                         <ul>
                             {friends.map((friend, index) => (
-                                <li onClick={handleOpenConversation(friend.id)} key={index}>{friend.name}</li>
+                                <li key={index} onClick={() => handleChatWithFriend(friend.id)}>{friend.name}</li>
                             ))}
                         </ul>
                     </div>
@@ -140,23 +144,21 @@ function Friends({ show, onClose }) {
                             ))
                         ) : (
                             messages.map((msg, index) => (
-                                <div key={index} className="chat-message">{msg}</div>
+                                <div key={index} className="chat-message">{msg.text}</div>
                             ))
                         )}
                     </div>
                 </div>
-                {chat && (
-                    <div className="chat-footer">
-                        <input 
-                            type="text" 
-                            value={message} 
-                            onChange={(e) => setMessage(e.target.value)} 
-                            className="chat-input" 
-                            placeholder="Type a message"
-                        />
-                        <button onClick={handleSendMessage} className="send-btn">Send</button>
-                    </div>
-                )}
+                <div className="chat-footer">
+                    <input 
+                        type="text" 
+                        value={message} 
+                        onChange={(e) => setMessage(e.target.value)} 
+                        className="chat-input" 
+                        placeholder="Type a message"
+                    />
+                    <button onClick={handleSendMessage} className="send-btn">Send</button>
+                </div>
             </div>
         </div>
     );

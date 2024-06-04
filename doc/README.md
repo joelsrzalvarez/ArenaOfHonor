@@ -70,6 +70,10 @@ v1.0
 - friends(array)
 - pendingFriendRequests(array)
 
+### Chats
+- participants(Array, required) // the two id involved to the conversation
+- messages(Array, required)
+
 ### Rooms
 
 - idHost(ObjectId, required)

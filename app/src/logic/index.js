@@ -19,6 +19,8 @@ import sendFriendRequest from './sendFriendRequest';
 import { acceptFriendRequest, rejectFriendRequest } from './acceptFriendRequest';
 import retrievePendingFriendRequests from './retrievePendingFriendRequests';
 import retrieveFriends from './retrieveFriends';
+import sendMessage from './sendMessage';
+import retrieveMessages from './retrieveMessages';
 
 const logic = {
     registerUser,
@@ -42,7 +44,9 @@ const logic = {
     acceptFriendRequest,
     rejectFriendRequest,
     retrievePendingFriendRequests,
-    retrieveFriends
+    retrieveFriends,
+    sendMessage,
+    retrieveMessages
 };
 
 export default logic;

@@ -1,4 +1,3 @@
-// logic/retrieveFriends.js (servidor)
 import { User } from '../data/index';
 import retrieveUser from './retrieveUser';
 import { validate, errors } from 'com';
@@ -15,13 +14,18 @@ async function retrieveFriends(userId) {
         }
 
         const friends = await Promise.all(
-            user.friends.map(friendId => retrieveUser(userId, friendId.toString()))
+            user.friends.map(friendId => {
+                return retrieveUser(userId, friendId.toString());
+            })
         );
 
-        return friends.map(friend => ({
-            name: friend.name.toString()
+        const result = friends.map(friend => ({
+            id: friend._id,
+            name: friend.name
         }));
+        return result;
     } catch (error) {
+        console.error('Error in retrieveFriends:', error);
         throw new SystemError(error.message);
     }
 }

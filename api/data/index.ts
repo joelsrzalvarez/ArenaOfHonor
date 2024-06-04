@@ -44,6 +44,26 @@ type CreateRoomType = {
     finished: boolean;
 };
 
+type ChatType = {
+    participants: mongoose.Types.ObjectId[];
+    messages: {
+        sender: mongoose.Types.ObjectId;
+        receiver: mongoose.Types.ObjectId;
+        text: string;
+        sentAt: Date;
+    }[];
+};
+
+interface Chat extends Document {
+    participants: mongoose.Types.ObjectId[];
+    messages: {
+        sender: mongoose.Types.ObjectId;
+        receiver: mongoose.Types.ObjectId;
+        text: string;
+        sentAt: Date;
+    }[];
+}
+
 interface Character extends Document {
     name: string;
     clase: string;
@@ -219,10 +239,40 @@ const roomSchema = new Schema<RoomDocument>({
     }
 });
 
+const chatSchema = new Schema<ChatType>({
+    participants: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }],
+    messages: [{
+        sender: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        receiver: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        text: {
+            type: String,
+            required: true
+        },
+        sentAt: {
+            type: Date,
+            required: true,
+            default: Date.now
+        }
+    }]
+});
+
 const User = model<UserType & Document>('User', userSchema);
 const Character = model<Character & Document>('Character', createCharacterSchema);
 const Shop = model<Shop & Document>('Shop', shopSchema);
 const RoomModel = model<RoomDocument & Document>('Room', roomSchema);
+const Chat = model<ChatType & Document>('Chat', chatSchema);
 
 export {
     UserType,
@@ -234,5 +284,7 @@ export {
     CreateShopType,
     Shop,
     CreateRoomType,
-    RoomModel
+    RoomModel,
+    ChatType,
+    Chat
 };
