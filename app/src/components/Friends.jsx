@@ -40,7 +40,7 @@ function Friends({ show, onClose }) {
                 } catch (error) {
                     console.error('Failed to retrieve messages:', error);
                 }
-            }, 5000); // Actualizar cada 5 segundos
+            }, 1000);
         }
 
         return () => clearInterval(interval);
@@ -56,7 +56,6 @@ function Friends({ show, onClose }) {
         if (message.trim() !== '' && selectedFriend) {
             try {
                 await logic.sendMessage(senderId, selectedFriend, message);
-                // Actualizar la lista de mensajes localmente
                 setMessages([...messages, { text: message, sender: senderId, sentAt: new Date() }]);
                 setMessage('');
             } catch (error) {
@@ -166,7 +165,7 @@ function Friends({ show, onClose }) {
                         ) : showPendingFriendRequests ? (
                             pendingRequests.map((request, index) => (
                                 <div key={index} className="chat-message">
-                                    {request.senderId} wants to be your friend.
+                                    {request.name} wants to be your friend.
                                     <button onClick={() => handleAcceptRequest(request.senderId)}>Accept</button>
                                     <button onClick={() => handleRejectRequest(request.senderId)}>Reject</button>
                                 </div>
