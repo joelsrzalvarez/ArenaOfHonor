@@ -84,7 +84,6 @@ function Friends({ show, onClose }) {
     const handlePendingFriendRequest = async () => {
         try {
             const pendingRequests = await logic.retrievePendingFriendRequests();
-            console.log('Pending Friend Requests:', pendingRequests);  // Añade este console.log
             setPendingRequests(Array.isArray(pendingRequests) ? pendingRequests : []);
             setShowPendingFriendRequests(true);
             setShowFriendRequestForm(false);
@@ -159,7 +158,7 @@ function Friends({ show, onClose }) {
                     <div className="friends-list">
                         <ul>
                             {friends.map((friend, index) => (
-                                <li key={index} onClick={() => handleChatWithFriend(friend.id)}>{friend.name}</li>
+                                <li key={index} onClick={() => handleChatWithFriend(friend.id)}>{friend.username}</li>
                             ))}
                         </ul>
                     </div>

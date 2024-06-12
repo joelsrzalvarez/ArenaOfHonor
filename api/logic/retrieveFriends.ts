@@ -21,7 +21,7 @@ async function retrieveFriends(userId) {
 
         const result = friends.map(friend => ({
             id: friend._id,
-            name: friend.name
+            username: friend.username
         }));
         return result;
     } catch (error) {
