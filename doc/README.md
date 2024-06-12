@@ -62,6 +62,7 @@ v1.0
 
 - name( string, required)
 - surname( string, required)
+- username( string, required)
 - email( string, required)
 - password( string, required)
 - inventory(Array, required)
