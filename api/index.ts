@@ -360,11 +360,11 @@ mongoose.connect(MONGODB_URL)
         }
     });
 
-    api.get('/users/email/:email', jsonBodyParser, async (req, res) => {
-        const { email } = req.params;
+    api.get('/users/username/:friendId', jsonBodyParser, async (req, res) => {
+        const { friendId } = req.params;
     
         try {
-            const userId = await logic.getEmailFriendRequest(email);
+            const userId = await logic.getUsernameFriendRequest(friendId);
             console.log(userId)
             res.status(200).json({userId});
         } catch (error) {

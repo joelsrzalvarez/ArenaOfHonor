@@ -12,7 +12,7 @@ import buyArenaPoints from './buyArenaPoints.ts'
 import updateWins from './updateWins.ts';
 import getEloFromCharacter from './getEloFromCharacter.ts'
 import updateUserPassword from './updateUserPassword.ts'
-import getEmailFriendRequest from './getEmailFriendRequest.ts'
+import getUsernameFriendRequest from './getEmailFriendRequest.ts'
 import sendFriendRequest from './sendFriendRequest.ts'
 import { acceptFriendRequest, rejectFriendRequest } from './acceptFriendRequest.ts'
 import retrievePendingFriendRequests from './retrievePendingFriendRequests.ts'
@@ -38,7 +38,7 @@ const logic = {
     updateWins,
     getEloFromCharacter,
     updateUserPassword,
-    getEmailFriendRequest,
+    getUsernameFriendRequest,
     sendFriendRequest,
     acceptFriendRequest,
     rejectFriendRequest,

@@ -166,11 +166,11 @@ function Friends({ show, onClose }) {
                         {showFriendRequestForm ? (
                             <form onSubmit={handleFriendRequestSubmit} className="friend-request-form">
                                 <input 
-                                    type="email" 
+                                    type="text" 
                                     value={friendRequest} 
                                     onChange={(e) => setFriendRequest(e.target.value)} 
                                     className="friend-input" 
-                                    placeholder="Enter friend's email"
+                                    placeholder="Enter friend's username"
                                 />
                                 <button type="submit" className="friend-submit-btn">Send</button>
                             </form>

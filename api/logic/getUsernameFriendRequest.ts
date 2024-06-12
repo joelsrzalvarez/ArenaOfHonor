@@ -1,8 +1,8 @@
 import {User} from '../data/index.ts';
 
-async function getEmailFriendRequest(email) {
+async function getUsernameFriendRequest(username) {
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ username });
         console.log(user)
         if (!user) {
             throw new Error('User not found');
@@ -13,4 +13,4 @@ async function getEmailFriendRequest(email) {
     }
 }
 
-export default getEmailFriendRequest;
+export default getUsernameFriendRequest;

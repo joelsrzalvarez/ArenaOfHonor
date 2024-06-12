@@ -1,10 +1,10 @@
 import decryptToken from "./decryptToken";
 
-async function sendFriendRequest(friendEmail) {
+async function sendFriendRequest(friendUsername) {
     const myId = decryptToken(sessionStorage.getItem('token')).sub;
 
     try {
-        const response = await fetch(`http://localhost:9000/users/email/${friendEmail}`, {
+        const response = await fetch(`http://localhost:9000/users/username/${friendUsername}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ async function sendFriendRequest(friendEmail) {
             throw new Error(`Failed to send friend request: ${errorText}`);
         }
 
-        return `Friend request sent to: ${friendEmail}`;
+        return `Friend request sent to: ${friendUsername}`;
     } catch (error) {
         throw new Error(error.message);
     }
