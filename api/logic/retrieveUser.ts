@@ -16,7 +16,7 @@ async function retrieveUser(userId, targetUserId) {
         const user = await User.findById(userId);
         if (!user) throw new NotFoundError('user not found');
 
-        const targetUser = await User.findById(targetUserId).select('name password email honor_points arena_points avatar inventory').lean();
+        const targetUser = await User.findById(targetUserId).select('name username email honor_points arena_points avatar inventory').lean();
         if (!targetUser) throw new NotFoundError('target user not found');
 
         const inventory = targetUser.inventory.map(item => ({
@@ -28,7 +28,7 @@ async function retrieveUser(userId, targetUserId) {
         const result = {
             _id: targetUser._id.toString(),
             name: targetUser.name,
-            password: targetUser.password,
+            username: targetUser.username,
             email: targetUser.email,
             honor_points: targetUser.honor_points,
             arena_points: targetUser.arena_points,

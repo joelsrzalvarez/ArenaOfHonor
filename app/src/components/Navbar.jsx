@@ -129,7 +129,7 @@ function Navbar({ onUserLoggedOut }) {
                         {user && (
                             <div className="dropdown show">
                                 <a className="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Welcome, {user.name}!
+                                    Welcome, {user.username}!
                                 </a>
                                 <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                     <a className="dropdown-item" onClick={handleOpenProfile} href="#"> 👤  | Profile</a>
