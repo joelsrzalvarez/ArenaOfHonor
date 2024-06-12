@@ -3,6 +3,7 @@ import mongoose, { Schema, model, Document } from 'mongoose';
 type UserType = {
     name: string;
     surname: string;
+    username: string; 
     email: string;
     password: string;
     honor_points: number;
@@ -12,7 +13,7 @@ type UserType = {
     avatar: string;
     friends: mongoose.Types.ObjectId[];
     pendingFriendRequests: mongoose.Types.ObjectId[];
-    status: 'online' | 'offline'; // Add the status field
+    status: 'online' | 'offline';
 };
 
 type InventoryItemType = {
@@ -122,6 +123,12 @@ const userSchema = new Schema<UserType>({
     surname: {
         type: String,
         required: true
+    },
+    username: { 
+        type: String,
+        required: true,
+        unique: true,
+        index: true
     },
     email: {
         type: String,

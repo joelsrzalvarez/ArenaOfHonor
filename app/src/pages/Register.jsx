@@ -11,6 +11,7 @@ function Register ({onUserRegistered, onLoginClick}) {
 
         const name = form.name.value
         const surname = form.surname.value
+        const username = form.username.value
         const email = form.email.value
         const password = form.password.value
         const honor_points = 0
@@ -19,7 +20,7 @@ function Register ({onUserRegistered, onLoginClick}) {
         const avatar = form.avatar.value
 
         try {
-            logic.registerUser(name, surname, email, password, honor_points, arena_points, vip, avatar)
+            logic.registerUser(name, surname, username, email, password, honor_points, arena_points, vip, avatar)
             .then(() => {
                     form.reset()
 
@@ -49,9 +50,9 @@ function Register ({onUserRegistered, onLoginClick}) {
                   <div className="mb-3">
                     <input type="text" className="form-control" id="surname" placeholder="Your surname" />
                   </div>
-                  {/* <div className="mb-3">
-                    <input type="date" className="form-control" id="birthdate" placeholder="Birthdate" />
-                  </div> */}
+                  <div className="mb-3">
+                    <input type="text" className="form-control" id="username" placeholder="Your username" />
+                  </div>
                   <div className="mb-3">
                     <input type="email" className="form-control" id="email" placeholder="Email" />
                   </div>

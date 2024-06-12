@@ -1,15 +1,17 @@
 import { validate, errors } from 'com'
 
-function registerUser(name, surname, email, password, honor_points, arena_points, vip, avatar) {
+function registerUser(name, surname, username, email, password, honor_points, arena_points, vip, avatar) {
     validate.text(name, 'name')
     validate.text(surname, 'surname')
+    validate.text(username, 'username')
     validate.email(email)
     validate.password(password)
     validate.text(avatar, 'avatar')
 
     const user = { 
         name, 
-        surname, 
+        surname,
+        username,
         email, 
         password, 
         honor_points, 
