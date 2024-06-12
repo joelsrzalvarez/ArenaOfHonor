@@ -84,6 +84,7 @@ function Friends({ show, onClose }) {
     const handlePendingFriendRequest = async () => {
         try {
             const pendingRequests = await logic.retrievePendingFriendRequests();
+            console.log('Pending Friend Requests:', pendingRequests);  // Añade este console.log
             setPendingRequests(Array.isArray(pendingRequests) ? pendingRequests : []);
             setShowPendingFriendRequests(true);
             setShowFriendRequestForm(false);
@@ -177,7 +178,7 @@ function Friends({ show, onClose }) {
                         ) : showPendingFriendRequests ? (
                             pendingRequests.map((request, index) => (
                                 <div key={index} className="chat-message">
-                                    {request.name} wants to be your friend.
+                                    {request.username} wants to be your friend.
                                     <button onClick={() => handleAcceptRequest(request.senderId)}>Accept</button>
                                     <button onClick={() => handleRejectRequest(request.senderId)}>Reject</button>
                                 </div>
