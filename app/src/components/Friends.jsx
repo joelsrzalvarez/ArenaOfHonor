@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import logic from '../logic';
 import './Friends.css';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 function Friends({ show, onClose }) {
     const [messages, setMessages] = useState([]);
@@ -12,8 +13,19 @@ function Friends({ show, onClose }) {
     const [pendingRequests, setPendingRequests] = useState([]);
     const [friends, setFriends] = useState([]);
     const [selectedFriend, setSelectedFriend] = useState(null);
-    const senderId = logic.decryptToken(sessionStorage.getItem('token')).sub;
+    const [senderId, setSenderId] = useState(null);
     const chatWindowRef = useRef(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            const decodedToken = logic.decryptToken(token);
+            setSenderId(decodedToken.sub);
+        } else {
+            navigate('/login');
+        }
+    }, []);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -32,7 +44,7 @@ function Friends({ show, onClose }) {
 
     useEffect(() => {
         let interval;
-        if (selectedFriend) {
+        if (selectedFriend && senderId) {
             interval = setInterval(async () => {
                 try {
                     const messages = await logic.retrieveMessages(senderId, selectedFriend);

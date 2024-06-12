@@ -119,46 +119,103 @@ mongoose.connect(MONGODB_URL)
             }
         }
     });
-        
+
+    api.post('/users/verify-token', (req, res) => {
+        const token = req.headers['authorization']?.split(' ')[1];
+    
+        if (!token) {
+            return res.status(400).json({ isValid: false, message: 'No token provided' });
+        }
+    
+        jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ isValid: false, message: 'Invalid token' });
+            }
+    
+            try {
+                const user = logic.findUserById(decoded.sub);
+    
+                if (!user) {
+                    return res.status(404).json({ isValid: false, message: 'User not found' });
+                }
+    
+                return res.status(200).json({ isValid: true, message: 'Token is valid' });
+            } catch (error) {
+                console.error('Error verifying token:', error);
+                return res.status(500).json({ isValid: false, message: 'Internal server error' });
+            }
+        });
+    });
     
     api.post('/users/auth', jsonBodyParser, (req, res) => {
         try {
-            const { email, password } = req.body
-
+            const { email, password } = req.body;
+    
             logic.authenticateUser(email, password)
-                .then(userId => {
-                    const token = jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: JWT_EXP })
-
-                    res.json(token)
+                .then(async userId => {
+                    try {
+                        await logic.updateUserStatus(userId, 'online');
+                    } catch (err) {
+                        res.status(500).json({ error: 'SystemError', message: 'Failed to update user status' });
+                        return;
+                    }
+    
+                    const token = jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: JWT_EXP });
+                    res.json(token);
                 })
                 .catch(error => {
                     if (error instanceof SystemError) {
-                        logger.error(error.message)
-
-                        res.status(500).json({ error: error.constructor.name, message: error.message })
+                        logger.error(error.message);
+                        res.status(500).json({ error: error.constructor.name, message: error.message });
                     } else if (error instanceof CredentialsError) {
-                        logger.warn(error.message)
-
-                        res.status(401).json({ error: error.constructor.name, message: error.message })
+                        logger.warn(error.message);
+                        res.status(401).json({ error: error.constructor.name, message: error.message });
                     } else if (error instanceof NotFoundError) {
-                        logger.warn(error.message)
-
-                        res.status(404).json({ error: error.constructor.name, message: error.message })
+                        logger.warn(error.message);
+                        res.status(404).json({ error: error.constructor.name, message: error.message });
                     }
-                })
+                });
         } catch (error) {
             if (error instanceof TypeError || error instanceof ContentError) {
-                logger.warn(error.message)
-
-                res.status(406).json({ error: error.constructor.name, message: error.message })
+                logger.warn(error.message);
+                res.status(406).json({ error: error.constructor.name, message: error.message });
             } else {
-                logger.warn(error.message)
-
-                res.status(500).json({ error: SystemError.name, message: error.message })
+                logger.warn(error.message);
+                res.status(500).json({ error: SystemError.name, message: error.message });
             }
         }
-    })
+    });
 
+    api.post('/users/logout', jsonBodyParser, (req, res) => {
+        try {
+            const { token } = req.body;
+    
+            const { sub: userId } = jwt.verify(token, JWT_SECRET);
+    
+            logic.updateUserStatus(userId, 'offline')
+                .then(() => {
+                    res.json({ message: 'User logged out and status updated to offline' });
+                })
+                .catch(error => {
+                    if (error instanceof NotFoundError) {
+                        logger.warn(error.message);
+                        res.status(404).json({ error: error.constructor.name, message: error.message });
+                    } else {
+                        logger.error(error.message);
+                        res.status(500).json({ error: SystemError.name, message: error.message });
+                    }
+                });
+        } catch (error) {
+            if (error instanceof jwt.JsonWebTokenError) {
+                logger.warn(error.message);
+                res.status(401).json({ error: 'Unauthorized', message: 'Invalid token' });
+            } else {
+                logger.error(error.message);
+                res.status(500).json({ error: SystemError.name, message: error.message });
+            }
+        }
+    });
+    
     api.post('/shop/buyArenaPoints', async (req, res) => {
         const { userId, quantity } = req.body;
     

@@ -8,10 +8,9 @@ import retrieveUser from '../logic/retrieveUser';
 import decryptToken from '../logic/decryptToken';
 import getEloFromCharacter from '../logic/getEloFromCharacter';
 import Game from '../components/Game/Game';
-import Chat from '../components/Friends';
-
-import './Home.css';
 import Friends from '../components/Friends';
+import { useNavigate } from 'react-router-dom';
+import './Home.css';
 
 function Home() {
     const [characters, setCharacters] = useState([]);
@@ -30,8 +29,24 @@ function Home() {
     const [enabledSkinSelectors, setEnabledSkinSelectors] = useState({});
     const [eloImages, setEloImages] = useState({});
     const [eloClasses, setEloClasses] = useState({});
-    const [divisions, setDivisions] = useState({ host: '', guest: '' });
     const [showChatModal, setShowChatModal] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+        const userId = decryptToken(token).sub;
+        retrieveUser(userId)
+            .then((user) => {
+                setInventoryItems(user.inventory);
+            })
+            .catch((error) => {
+                console.error('Error retrieving inventory items:', error);
+            });
+    }, [navigate]);
 
     useEffect(() => {
         const newSocket = io('ws://localhost:9000');
@@ -52,27 +67,22 @@ function Home() {
                 setRoomId(data.roomId);
                 setPlayers(data.players);
                 setGameFound(true);
-    
+
                 const [hostId, guestId] = data.players;
                 const hostCharacter = characters.find(char => char._id === hostId);
                 const guestCharacter = characters.find(char => char._id === guestId);
                 setPlayerNames({ host: hostCharacter ? hostCharacter.name : 'Host', guest: guestCharacter ? guestCharacter.name : 'Guest' });
-    
+
                 const selectedSkins = {
                     host: data.skins[0],
                     guest: data.skins[1]
                 };
-                // const selectedDivisions = {
-                //     host: data.divisions[0],
-                //     guest: data.divisions[1]
-                // };
                 setSkins(selectedSkins);
-                // setDivisions(selectedDivisions);
             } else {
                 console.log('This client is not part of the match');
             }
         });
-    
+
         return () => {
             newSocket.off('connect');
             newSocket.off('disconnect');
@@ -111,20 +121,6 @@ function Home() {
         loadCharacters();
     }, []);
     
-    useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        if (token) {
-            const userId = decryptToken(token).sub;
-            retrieveUser(userId)
-                .then((user) => {
-                    setInventoryItems(user.inventory);
-                })
-                .catch((error) => {
-                    console.error('Error retrieving inventory items:', error);
-                });
-        }
-    }, []);
-
     const handleCreateCharacterClick = () => {
         setShowCreateCharacter(true);
     };

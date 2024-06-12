@@ -8,10 +8,11 @@ type UserType = {
     honor_points: number;
     arena_points: number;
     inventory: Array<InventoryItemType>;
-    vip: boolean;         
+    vip: boolean;
     avatar: string;
     friends: mongoose.Types.ObjectId[];
     pendingFriendRequests: mongoose.Types.ObjectId[];
+    status: 'online' | 'offline'; // Add the status field
 };
 
 type InventoryItemType = {
@@ -150,15 +151,20 @@ const userSchema = new Schema<UserType>({
         default: '',
         required: true
     },
-    friends: { 
+    friends: {
         type: [Schema.Types.ObjectId],
         ref: 'User',
         default: []
     },
-    pendingFriendRequests: { 
+    pendingFriendRequests: {
         type: [Schema.Types.ObjectId],
         ref: 'User',
         default: []
+    },
+    status: {
+        type: String,
+        enum: ['online', 'offline'],
+        default: 'offline'
     }
 });
 
